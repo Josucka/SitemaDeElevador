@@ -36,9 +36,6 @@
                 {
                     andaresMenosUtilizados.Add(kvp.Key);
                 }
-            }
-            return andaresMenosUtilizados;
-        }
 
         public List<char> elevadorMaisFrequentado()
         {
@@ -91,16 +88,6 @@
                 {
                     contagemPeriodos[uso]++;
                 }
-
-                // Encontra o período com o maior número de usos
-                char periodoMaisFrequentado = ' ';
-                int maiorContagem = 0;
-                foreach (var kvp in contagemPeriodos)
-                {
-                    if (kvp.Value > maiorContagem)
-                    {
-                        periodoMaisFrequentado = kvp.Key;
-                        maiorContagem = kvp.Value;
                     }
                 }
 
@@ -164,15 +151,6 @@
                 {
                     contagemPeriodos[uso]++;
                 }
-
-                char periodoMenosFrequentado = ' ';
-                int menorContagem = int.MaxValue;
-                foreach (var kvp in contagemPeriodos)
-                {
-                    if (kvp.Value < menorContagem)
-                    {
-                        periodoMenosFrequentado = kvp.Key;
-                        menorContagem = kvp.Value;
                     }
                 }
 
