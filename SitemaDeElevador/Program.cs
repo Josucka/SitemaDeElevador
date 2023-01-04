@@ -1,6 +1,13 @@
-﻿
-using SitemaDeElevador.Services;
+﻿using SitemaDeElevador.Services;
 
-var dados = SerializedJson.Ler<Predio>("input.json");
-
-Console.WriteLine(dados.Andar);
+ElevadorService fluxo = new ElevadorService();
+fluxo.imprimeResultadoNaTelaAndarUtilizado();
+Console.WriteLine("-------");
+fluxo.imprimeElevadorMaisFrequentadoPerioMaiorFluxo();
+Console.WriteLine("-------");
+fluxo.imprimeElevadorMenosFrequentadoPeriodoMenosFluxo();
+Console.WriteLine("-------");
+fluxo.imprimePeriodoMaiorUtilizacaoConjuntoElevadores();
+Console.WriteLine("-------");
+fluxo.imprimePercentualDeUsoElevadores();
+Console.WriteLine("-------");

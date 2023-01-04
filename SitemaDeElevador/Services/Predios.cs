@@ -2,6 +2,12 @@
 
 namespace SitemaDeElevador.Services
 {
+    public class Predios
+    {
+        [JsonProperty("predios")]
+        public Predio[] Predio { get; set; }
+    }
+
     public class Predio
     {
         [JsonProperty("andar")]

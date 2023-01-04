@@ -2,278 +2,301 @@
 {
     public class ElevadorService : IElevadorServices
     {
-        private List<Predio> _predio;
-        private SerializedJson _serialized;
-        public ElevadorService(List<Predio> predio, SerializedJson serialized)
+        private Predios _predios;
+        public ElevadorService()
         {
-            _predio = predio;
-            _serialized = serialized;
+            DeserializedJson deserialized = new DeserializedJson();
+            _predios = deserialized.DeserializeJson("input.json");
+
         }
 
         public List<int> andarMenosUtilizado()
         {
-            
-            var contagemAndares = new Dictionary<int, int>();
-            for (int i = 0; i <= 15; i++)
+            Dictionary<int, int> andares = new Dictionary<int, int>();
+            foreach (Predio predio in _predios.Predio)
             {
-                contagemAndares[i] = 0;
-            }
-
-            //contabiliza o uso de cada andar
-            foreach (var elevador in _predio)
-            {
-                foreach (var uso in elevador.Elevador)
+                if (!andares.ContainsKey(predio.Andar))
                 {
-                    contagemAndares[uso]++;
+                    andares.Add(predio.Andar, predio.Andar);
+                }
+                else
+                {
+                    andares[predio.Andar]++;
                 }
             }
 
-            int menorContagem = contagemAndares.Values.Min();
-            var andaresMenosUtilizados = new List<int>();
-            foreach (var kvp in contagemAndares)
-            {
-                if (kvp.Value == menorContagem)
-                {
-                    andaresMenosUtilizados.Add(kvp.Key);
-                }
+            int menorUtilizacao = andares.Values.Min();
+
+            return andares.Where(x => x.Value == menorUtilizacao).Select(x => x.Value).ToList();
+        }
 
         public List<char> elevadorMaisFrequentado()
         {
-            var contagemElevadores = new Dictionary<char, int>();
-            contagemElevadores['A'] = 0;
-            contagemElevadores['B'] = 0;
-            contagemElevadores['C'] = 0;
-            contagemElevadores['D'] = 0;
-            contagemElevadores['E'] = 0;
-
-            //contabiliza o uso de cada elevadores
-            foreach (var elevador in _predio)
+            Dictionary<char, int> elevadores = new Dictionary<char, int>();
+            foreach (Predio predio in _predios.Predio)
             {
-                contagemElevadores[elevador.Elevador[0]] += elevador.Andar;
-            }
-
-            int maiorContagem = contagemElevadores.Values.Max();
-            var elevadoresMaisFrequentados = new List<char>();
-            foreach (var kvp in contagemElevadores)
-            {
-                if (kvp.Value == maiorContagem)
+                if (!elevadores.ContainsKey(predio.Elevador[0]))
                 {
-                    elevadoresMaisFrequentados.Add(kvp.Key);
+                    elevadores.Add(predio.Elevador[0], 1);
+                }
+                else
+                {
+                    elevadores[predio.Elevador[0]]++;
                 }
             }
-            return elevadoresMaisFrequentados;
+
+            int maiorUtilizacao = elevadores.Values.Max();
+
+            return elevadores.Where(x => x.Value == maiorUtilizacao).Select(x => x.Key).ToList();
         }
 
         public List<char> periodoMaiorFluxoElevadorMaisFrequentado()
         {
-            var elevadoresMaisFrequentados = elevadorMaisFrequentado();
+            List<char> elevadorMaisFrequentado = elevadorMenosFrequentado();
 
-            var periodosMaiorFluxo = new List<char>();
-
-            foreach (var elevador in _predio)
+            Dictionary<char, int> turnos = new Dictionary<char, int>();
+            foreach(Predio predio in _predios.Predio)
             {
-                // Pula os elevadores que não estão na lista de elevadores mais frequentados
-                if (!elevadoresMaisFrequentados.Contains(elevador.Elevador[0]))
+                if (predio.Elevador[0] == elevadorMaisFrequentado[0])
                 {
-                    continue;
-                }
-
-                // Cria um dicionário para armazenar a contagem de uso de cada período
-                var contagemPeriodos = new Dictionary<char, int>();
-                contagemPeriodos['M'] = 0;
-                contagemPeriodos['V'] = 0;
-                contagemPeriodos['N'] = 0;
-
-                foreach (var uso in elevador.Elevador)
-                {
-                    contagemPeriodos[uso]++;
-                }
+                    if (!turnos.ContainsKey(predio.Turno[0]))
+                    {
+                        turnos.Add(predio.Turno[0], 1);
+                    }
+                    else
+                    {
+                        turnos[predio.Turno[0]]++;
                     }
                 }
-
-                // Adiciona o período mais frequentado à lista
-                periodosMaiorFluxo.Add(periodoMaisFrequentado);
             }
 
-            return periodosMaiorFluxo;
+            int maiorUtilizacao = turnos.Values.Max();
+
+            return turnos.Where(x => x.Value == maiorUtilizacao).Select(x => x.Key).ToList();
         }
 
         public List<char> elevadorMenosFrequentado()
         {
-            var contagemElevadores = new Dictionary<char, int>();
-            contagemElevadores['A'] = 0;
-            contagemElevadores['B'] = 0;
-            contagemElevadores['C'] = 0;
-            contagemElevadores['D'] = 0;
-            contagemElevadores['E'] = 0;
-
-            // Itera pelos elevadores e contabiliza o uso de cada um
-            foreach (var elevador in _predio)
+            Dictionary<char, int> elevadores = new Dictionary<char, int>();
+            foreach (Predio predio in _predios.Predio)
             {
-                contagemElevadores[elevador.Elevador[0]] += elevador.Andar;
-            }
-
-            // Encontra o menor número de uso
-            int menorContagem = contagemElevadores.Values.Min();
-            var elevadoresMenosFrequentados = new List<char>();
-            foreach (var kvp in contagemElevadores)
-            {
-                if (kvp.Value == menorContagem)
+                if (!elevadores.ContainsKey(predio.Elevador[0]))
                 {
-                    elevadoresMenosFrequentados.Add(kvp.Key);
+                    elevadores.Add(predio.Elevador[0], 1);
+                }
+                else
+                {
+                    elevadores[predio.Elevador[0]]++;
                 }
             }
 
-            return elevadoresMenosFrequentados;
+            int menorUtilizacao = elevadores.Values.Min();
+
+            return elevadores.Where(x => x.Value == menorUtilizacao).Select(x => x.Key).ToList();
         }
 
         public List<char> periodoMenorFluxoElevadorMenosFrequentado()
         {
-            var elevadoresMenosFrequentados = elevadorMenosFrequentado();
-            var periodosMenorFluxo = new List<char>();
+            List<char> elevadorMenosFrequentado = elevadorMaisFrequentado();
 
-            foreach (var elevador in _predio)
+            Dictionary<char, int> turnos = new Dictionary<char, int>();
+            foreach (Predio predio in _predios.Predio)
             {
-                // Pula os elevadores que não estão na lista de elevadores menos frequentados
-                if (!elevadoresMenosFrequentados.Contains(elevador.Elevador[0]))
+                if (predio.Elevador[0] == elevadorMenosFrequentado[0])
                 {
-                    continue;
-                }
-
-                // Cria um dicionário para armazenar a contagem de uso de cada período
-                var contagemPeriodos = new Dictionary<char, int>();
-                contagemPeriodos['M'] = 0;
-                contagemPeriodos['V'] = 0;
-                contagemPeriodos['N'] = 0;
-
-                // Itera pelos usos do elevador e contabiliza o número de vezes que cada período foi utilizado
-                foreach (var uso in elevador.Turno)
-                {
-                    contagemPeriodos[uso]++;
-                }
+                    if (!turnos.ContainsKey(predio.Turno[0]))
+                    {
+                        turnos.Add(predio.Turno[0], 1);
+                    }
+                    else
+                    {
+                        turnos[predio.Turno[0]]++;
                     }
                 }
-
-                periodosMenorFluxo.Add(periodoMenosFrequentado);
             }
 
-            return periodosMenorFluxo;
+            int menorUtilizacao = turnos.Values.Min();
+
+            return turnos.Where(x => x.Value == menorUtilizacao).Select(x => x.Key).ToList();
         }
 
         public List<char> periodoMaiorUtilizacaoConjuntoElevadores()
         {
-            var contagemPeriodos = new Dictionary<char, int>();
-            contagemPeriodos['M'] = 0;
-            contagemPeriodos['V'] = 0;
-            contagemPeriodos['N'] = 0;
+            Dictionary<char, int> turnos = new Dictionary<char, int>();
 
-            // Itera pelos elevadores
-            foreach (var elevador in _predio)
+            foreach(Predio predio in _predios.Predio)
             {
-                // Itera pelos usos do elevador e contabiliza o número de vezes que cada período foi utilizado
-                foreach (var uso in elevador.Turno)
+                if (!turnos.ContainsKey(predio.Turno[0]))
                 {
-                    contagemPeriodos[uso]++;
+                    turnos.Add(predio.Turno[0], 1);
+                }
+                else
+                {
+                    turnos[predio.Turno[0]]++;
                 }
             }
 
-            // Encontra o período com o maior número de usos
-            char periodoMaisFrequentado = ' ';
-            int maiorContagem = 0;
+            int maiorUtilizacao = turnos.Values.Max();
 
-            foreach (var kvp in contagemPeriodos)
-            {
-                if (kvp.Value > maiorContagem)
-                {
-                    maiorContagem = kvp.Value;
-                }
-            }
-
-            var periodosMaiorUtilizacao = new List<char>();
-            foreach (var kvp in contagemPeriodos)
-            {
-                if (kvp.Value == maiorContagem)
-                {
-                    periodosMaiorUtilizacao.Add(kvp.Key);
-                }
-            }
-
-            return periodosMaiorUtilizacao;
+            return turnos.Where(x => x.Value == maiorUtilizacao).Select(x => x.Key).ToList();
         }
 
         public float percentualDeUsoElevadorA()
         {
-            // Obtém o número total de usos de todos os elevadores
-            int totalUsos = _predio.Sum(e => e.Andar);
-
-            // Obtém o número de usos do elevador A
-            int usosElevadorA = _predio.First(e => e.Elevador[0] == 'A').Andar;
-
-            // Calcula o percentual de uso do elevador A
-            float percentualDeUso = (float)usosElevadorA / totalUsos;
-
-            // Retorna o percentual de uso com duas casas decimais
-            return (float)Math.Round(percentualDeUso, 2);
+            return CalcularPercentualElevadores('A');
         }
 
         public float percentualDeUsoElevadorB()
         {
-            // Obtém o número total de usos de todos os elevadores
-            int totalUsos = _predio.Sum(e => e.Andar);
-
-            // Obtém o número de usos do elevador A
-            int usosElevadorA = _predio.First(e => e.Elevador[0] == 'B').Andar;
-
-            // Calcula o percentual de uso do elevador A
-            float percentualDeUso = (float)usosElevadorA / totalUsos;
-
-            // Retorna o percentual de uso com duas casas decimais
-            return (float)Math.Round(percentualDeUso, 2);
+            return CalcularPercentualElevadores('B');
         }
 
         public float percentualDeUsoElevadorC()
         {
-            // Obtém o número total de usos de todos os elevadores
-            int totalUsos = _predio.Sum(e => e.Andar);
-
-            // Obtém o número de usos do elevador A
-            int usosElevadorA = _predio.First(e => e.Elevador[0] == 'C').Andar;
-
-            // Calcula o percentual de uso do elevador A
-            float percentualDeUso = (float)usosElevadorA / totalUsos;
-
-            // Retorna o percentual de uso com duas casas decimais
-            return (float)Math.Round(percentualDeUso, 2);
+            return CalcularPercentualElevadores('C');
         }
 
         public float percentualDeUsoElevadorD()
         {
-            // Obtém o número total de usos de todos os elevadores
-            int totalUsos = _predio.Sum(e => e.Andar);
-
-            // Obtém o número de usos do elevador A
-            int usosElevadorA = _predio.First(e => e.Elevador[0] == 'D').Andar;
-
-            // Calcula o percentual de uso do elevador A
-            float percentualDeUso = (float)usosElevadorA / totalUsos;
-
-            // Retorna o percentual de uso com duas casas decimais
-            return (float)Math.Round(percentualDeUso, 2);
+            return CalcularPercentualElevadores('D');
         }
 
         public float percentualDeUsoElevadorE()
         {
-            // Obtém o número total de usos de todos os elevadores
-            int totalUsos = _predio.Sum(e => e.Andar);
+            return CalcularPercentualElevadores('E');
+        }
+        private float CalcularPercentualElevadores(char nome)
+        {
+            int utilizacoesElevador = _predios.Predio.Count(x => x.Elevador[0] == nome);
 
-            // Obtém o número de usos do elevador A
-            int usosElevadorA = _predio.First(e => e.Elevador[0] == 'E').Andar;
+            return (float)utilizacoesElevador / _predios.Predio.Length * 100;
+        }
 
-            // Calcula o percentual de uso do elevador A
-            float percentualDeUso = (float)usosElevadorA / totalUsos;
+        public void imprimeResultadoNaTelaAndarUtilizado()
+        {
+            Console.WriteLine("What is the floor less used by users?");
+            List<int> andaresUtilizados = andarMenosUtilizado();
+            if (andaresUtilizados.Count > 1)
+            {
+                Console.WriteLine($"The least used floor is: {andaresUtilizados[0]}");
+            }
+            else
+            {
+                Console.Write("The least used floors are: ");
+                for (int i = 0; i < andaresUtilizados.Count; i++)
+                {
+                    if (i == andaresUtilizados.Count - 1)
+                    {
+                        Console.WriteLine(andaresUtilizados[i]);
+                    }
+                    else
+                    {
+                        Console.Write(andaresUtilizados[i] + ". ");
+                    }
+                }
+            }
+        }
+        public void imprimeElevadorMaisFrequentadoPerioMaiorFluxo()
+        {
+            Console.WriteLine("What is the most frequented elevator and the period that is the largest flow? ");
+            List<char> elevadorFrequentado = elevadorMaisFrequentado();
+            if(elevadorFrequentado.Count > 1)
+            {
+                Console.WriteLine($"The most frequented elevators are: {elevadorFrequentado}");
+            }
+            else
+            {
+                Console.WriteLine($"The most frequented elevator is: {elevadorFrequentado[0]}");
+            }
+            
+            List<char> fluxoElevadorFrequentado = periodoMaiorFluxoElevadorMaisFrequentado();
+            if(fluxoElevadorFrequentado.Count > 1)
+            {
+                Console.WriteLine($"The periods of lower flow are: {fluxoElevadorFrequentado}");
+            }
+            else
+            {
+                Console.WriteLine($"The period of least flow is: {fluxoElevadorFrequentado[0]}");
+            }
+        }
+        public void imprimeElevadorMenosFrequentadoPeriodoMenosFluxo()
+        {
+            //Console.WriteLine("Qual é o elevador menos frequentado e o período que se encontra menor fluxo?");
+            //List<char> elevadoresFrequentados = periodoMenorFluxoElevadorMenosFrequentado();
+            //foreach (char elevador in elevadoresFrequentados)
+            //{
+            //    Console.WriteLine("O elevador " + elevador + " foi menos frequentado e se encontra em período de menor fluxo.");
+            //}
+            Console.WriteLine("Which is the least frequented elevator and the least flow period? ");
+            List<char> elevadorfrequentado = periodoMenorFluxoElevadorMenosFrequentado();
+            if (elevadorfrequentado.Count > 1)
+            {
+                Console.WriteLine($"The least frequented elevators are: {elevadorfrequentado}");
+            }
+            else
+            {
+                Console.WriteLine($"The least frequented elevator is: {elevadorfrequentado[0]}");
+            }
 
-            // Retorna o percentual de uso com duas casas decimais
-            return (float)Math.Round(percentualDeUso, 2);
+            List<char> fluxoElevadorfrequentado = periodoMenorFluxoElevadorMenosFrequentado();
+            if (fluxoElevadorfrequentado.Count > 1)
+            {
+                Console.WriteLine($"The periods of lower flow are: {fluxoElevadorfrequentado}");
+            }
+            else
+            {
+                Console.WriteLine($"The period of least flow is: {fluxoElevadorfrequentado[0]}");
+            }
+        }
+        public void imprimePeriodoMaiorUtilizacaoConjuntoElevadores()
+        {
+            Console.WriteLine("What is the period of greatest use of the set of elevators? ");
+            List<char> periodoConjuntoElevador = periodoMaiorUtilizacaoConjuntoElevadores();
+            if(periodoConjuntoElevador.Count > 1)
+            {
+                Console.WriteLine($"The periods of greatest use of the set of elevators are: {periodoConjuntoElevador}");
+            }
+            else
+            {
+                Console.WriteLine($"The period of greatest use of the lift assembly is: {periodoConjuntoElevador[0]}");
+            }
+        }
+        public Dictionary<char, float> percentualDeUsoElevadores()
+        {
+            int totalServicos = _predios.Predio.SelectMany(p => p.Elevador).Count();
+
+            Dictionary<char, int> contagemUsoElevadores = new Dictionary<char, int>();
+            foreach (var predio in _predios.Predio)
+            {
+                foreach (var p in predio.Elevador)
+                {
+                    if (contagemUsoElevadores.ContainsKey(p))
+                    {
+                        contagemUsoElevadores[p]++;
+                    }
+                    else
+                    {
+                        contagemUsoElevadores[p] = 1;
+                    }
+                }
+            }
+
+            Dictionary<char, float> percentualDeUsoElevadores = new Dictionary<char, float>();
+            foreach (var elevador in contagemUsoElevadores)
+            {
+                percentualDeUsoElevadores[elevador.Key] = (float)elevador.Value / totalServicos * 100;
+            }
+
+            return percentualDeUsoElevadores;
+        }
+        public void imprimePercentualDeUsoElevadores()
+        {
+            Console.WriteLine("What is the percentage of use of each elevator in relation to all services provided?");
+            Dictionary<char, float> percentualDeUso = percentualDeUsoElevadores();
+            foreach (var elevador in percentualDeUso)
+            {
+                Console.WriteLine("The elevator " + elevador.Key + " was used in " + elevador.Value + "% of the services provided.");
+            }
         }
     }
 }
